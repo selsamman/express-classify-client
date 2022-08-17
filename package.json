@@ -1,6 +1,6 @@
 {
   "name": "express-classify-client",
-  "version": "1.0.1",
+  "version": "1.0.7",
   "description": "Typescript round trip browser to express server with sessions and socket.io",
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
@@ -26,7 +26,7 @@
     "build:esm": "tsc",
     "build:cjs": "tsc --module commonjs --outDir lib/cjs",
     "test": "jest",
-    "publish": "yarn build && npm publish"
+    "pub": "yarn build && npm publish"
   },
   "dependencies": {
     "js-freeze-dry": "^1.0.0",

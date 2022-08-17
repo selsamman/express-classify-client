@@ -1,6 +1,6 @@
 import {serialize, deserialize} from "js-freeze-dry";
 import axios from "axios";
-import {io, Socket} from "socket.io-client";
+import {io, ManagerOptions, Socket, SocketOptions} from "socket.io-client";
 
 export const value : unknown = undefined;
 
@@ -9,6 +9,8 @@ export class ExpressClient {
     logLevel: Partial<typeof EndPointsLogging> = {};
     listener: ((data: any) => void) | undefined;
     socket : Socket | undefined = undefined;
+    url = "";
+    options :  Partial<ManagerOptions & SocketOptions> = {};
 
     log: (message: string) => void = msg => console.log(msg);
 
@@ -24,9 +26,15 @@ export class ExpressClient {
         this.listener = listener;
     }
 
+    setURL(url : string) {
+        this.url = url;
+    }
+
+    setOptions(options : Partial<ManagerOptions & SocketOptions>) { this.options = options }
+
     async initSocket (urlPrefix : string) {
-        await axios.post(`/${urlPrefix}`, {json: {}});
-        this.socket = io();
+        await axios.post(`${this.url}/${urlPrefix}`, {json: {}});
+        this.socket = io(this.url, this.options);
         await new Promise (resolve => {
             this.socket && this.socket.on("connect", () => {
                 this.log(`Connected to socket ${this.socket ? this.socket.id : ''}`);
@@ -43,7 +51,7 @@ export class ExpressClient {
 
         for (const methodName of Object.getOwnPropertyNames(Object.getPrototypeOf(client))) {
 
-            const endPoint = `/${urlPrefix}.${methodName}`;
+            const endPoint = `${this.url}/${urlPrefix}.${methodName}`;
 
             if (methodName === 'constructor' || typeof (client as any)[methodName] !== 'function')
                 continue;
